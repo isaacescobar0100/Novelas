@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Frutinovelas Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,700;1,9..144,900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#14060e; --ink2:#2a0a1f;
+    --cream:#fef6e4;
+    --magenta:#e91e63;
+    --gold:#f5b800;
+    --orange:#ff6b35;
+    --line:rgba(254,246,228,.22);
+    --muted:rgba(254,246,228,.65);
+    --faint:rgba(254,246,228,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'DM Sans',system-ui,sans-serif;
+    color:var(--cream);
+    background:radial-gradient(ellipse at top left,#2a0a1f 0%,#14060e 45%,#0a0408 100%) fixed;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .grain{position:fixed;inset:0;pointer-events:none;opacity:.08;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+  .wrap{position:relative;max-width:1000px;margin:0 auto;padding:32px 18px 80px;}
+  @media(min-width:700px){.wrap{padding:48px 32px 80px;}}
+  .stamp{display:inline-block;padding:4px 10px;font-size:10px;letter-spacing:.25em;
+    text-transform:uppercase;border:1px solid currentColor;transform:rotate(-2deg);
+    margin-right:8px;}
+  h1.title{font-family:'Fraunces',serif;font-style:italic;font-weight:900;
+    font-variation-settings:"opsz" 144,"SOFT" 100,"WONK" 1;
+    font-size:clamp(3rem,9vw,6.5rem);line-height:.85;letter-spacing:-.04em;
+    margin:14px 0 0;color:var(--cream);}
+  h1.title .pink{color:var(--magenta)}
+  h1.title .gold{color:var(--gold);font-style:italic;display:block}
+  .sub{margin:20px 0 0;max-width:520px;font-size:17px;font-style:italic;color:var(--muted)}
+  .sub .pink{color:var(--magenta);font-style:normal}
+
+  .panel{padding:22px;margin-top:36px;background:rgba(254,246,228,.04);
+    border:1px solid var(--line);backdrop-filter:blur(8px);}
+  @media(min-width:700px){.panel{padding:28px}}
+  .panel h2{font-size:11px;letter-spacing:.3em;text-transform:uppercase;
+    color:var(--faint);margin:0 0 18px;display:flex;align-items:center;gap:8px;}
+  .panel-lbl{font-size:12px;color:var(--faint);margin:0 0 10px}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+  .chip{padding:9px 13px;font-size:14px;background:transparent;color:var(--muted);
+    border:1px solid var(--line);cursor:pointer;font-family:inherit;transition:.15s;}
+  .chip:hover{border-color:var(--cream)}
+  .chip.on-pink{background:var(--magenta);color:var(--cream);border-color:var(--magenta);font-weight:700}
+  .chip.on-gold{background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:700}
+  .chip.on-cream{background:var(--cream);color:var(--ink);border-color:var(--cream);font-weight:700}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:14px 26px;font-size:13px;letter-spacing:.2em;text-transform:uppercase;
+    font-weight:700;cursor:pointer;border:0;font-family:inherit;transition:.15s;}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .btn-pink{background:var(--magenta);color:var(--cream)}
+  .btn-gold{background:var(--gold);color:var(--ink)}
+  .btn-orange{background:var(--orange);color:var(--ink)}
+  .btn-ghost{background:transparent;color:var(--cream);border:1px solid var(--line)}
+
+  .tabs{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:2px;
+    padding:14px 0;margin:30px -18px 24px;padding-left:18px;padding-right:18px;
+    background:linear-gradient(to bottom,#14060e 70%,transparent 100%);}
+  @media(min-width:700px){.tabs{margin-left:0;margin-right:0;padding-left:0;padding-right:0;}}
+  .tab{display:flex;align-items:center;gap:8px;padding:9px 12px;font-size:12px;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--faint);cursor:pointer;
+    background:transparent;border:0;border-bottom:2px solid transparent;font-family:inherit;}
+  .tab.active{color:var(--gold);border-color:var(--gold);font-weight:700}
+  .tab .dot{width:6px;height:6px;border-radius:50%;background:var(--magenta);}
+
+  h3.panel-title{font-family:'Fraunces',serif;font-style:italic;font-weight:700;
+    font-size:clamp(2rem,5vw,3rem);line-height:1;letter-spacing:-.02em;
+    margin:0 0 18px;color:var(--cream)}
+  .panel-sub{font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--faint);margin-top:-12px;margin-bottom:18px}
+
+  .out{padding:24px;white-space:pre-wrap;font-size:15px;line-height:1.65;
+    background:var(--cream);color:var(--ink);box-shadow:0 20px 60px -20px rgba(233,30,99,.3);}
+  .out.pink{border-left:4px solid var(--magenta)}
+  .out.gold{border-left:4px solid var(--gold)}
+  .out.orange{border-left:4px solid var(--orange)}
+
+  .empty{padding:42px 22px;text-align:center;color:var(--faint);font-style:italic;
+    border:1px dashed var(--line);}
+
+  .row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+
+  .copy{display:inline-flex;align-items:center;gap:6px;font-size:11px;
+    letter-spacing:.2em;text-transform:uppercase;padding:7px 12px;
+    background:transparent;color:inherit;border:1px solid currentColor;
+    cursor:pointer;font-family:inherit;opacity:.8;}
+  .copy:hover{opacity:1}
+
+  .spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;
+    border-right-color:transparent;border-radius:50%;animation:s 1s linear infinite}
+  @keyframes s{to{transform:rotate(360deg)}}
+
+  .modal-bg{position:fixed;inset:0;background:rgba(10,4,8,.85);backdrop-filter:blur(12px);
+    display:flex;align-items:center;justify-content:center;z-index:50;padding:20px;}
+  .modal{max-width:480px;width:100%;background:var(--ink2);border:1px solid var(--line);padding:32px;max-height:90vh;overflow-y:auto;}
+  .modal h2{font-family:'Fraunces',serif;font-style:italic;font-size:32px;margin:0 0 14px;color:var(--gold);font-weight:700}
+  .modal p{color:var(--muted);font-size:14px;line-height:1.55;margin:0 0 14px}
+  .modal a{color:var(--magenta);text-decoration:underline}
+  .modal input{width:100%;padding:12px 14px;background:var(--ink);border:1px solid var(--line);
+    color:var(--cream);font-family:'DM Mono',monospace;font-size:13px;margin-bottom:14px;}
+  .modal input:focus{outline:1px solid var(--magenta);border-color:var(--magenta)}
+  .modal .warn{font-size:12px;color:var(--faint);font-style:italic;margin-top:10px}
+  .modal ol{color:var(--muted);font-size:13px;padding-left:20px;line-height:1.7}
+
+  .free-badge{display:inline-block;padding:3px 8px;background:var(--gold);color:var(--ink);font-size:10px;letter-spacing:.2em;font-weight:700;margin-bottom:12px;}
+
+  .key-btn{position:fixed;top:18px;right:18px;z-index:4;background:rgba(254,246,228,.08);
+    border:1px solid var(--line);color:var(--muted);padding:7px 12px;font-size:11px;
+    letter-spacing:.15em;text-transform:uppercase;cursor:pointer;font-family:inherit;}
+  .key-btn:hover{color:var(--cream)}
+
+  footer{font-size:12px;color:var(--faint);padding-top:30px;margin-top:40px;
+    border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+  footer .it{font-style:italic}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div id="app"></div>
+
+<script type="module">
+import { h, render } from 'https://esm.sh/preact@10.22.0';
+import { useState, useEffect } from 'https://esm.sh/preact@10.22.0/hooks';
+import htm from 'https://esm.sh/htm@3.1.1';
+const html = htm.bind(h);
+
+const FRUITS = ['🍓 Fresa','🥭 Mango','🍍 Piña','🍎 Manzana','🍐 Pera','🍉 Sandía','🍊 Naranja','🍋 Limón','🍌 Plátano','🍇 Uva','🥥 Coco','🥝 Kiwi','🥑 Aguacate','🍑 Cereza','🫐 Arándano','🍒 Guinda'];
+
+const DRAMAS = [
+  {id:'infidelidad', label:'Infidelidad',         icon:'💔'},
+  {id:'venganza',    label:'Venganza',            icon:'🗡️'},
+  {id:'secreto',     label:'Secreto familiar',    icon:'🤫'},
+  {id:'amor',        label:'Amor prohibido',      icon:'💋'},
+  {id:'herencia',    label:'Herencia perdida',    icon:'💰'},
+  {id:'identidad',   label:'Identidad oculta',    icon:'🎭'},
+  {id:'gemelo',      label:'Gemelo malvado',      icon:'👯'},
+  {id:'embarazo',    label:'Embarazo sorpresa',   icon:'🤰'},
+  {id:'traicion',    label:'Traición de amiga',   icon:'🥀'},
+  {id:'amnesia',     label:'Amnesia trágica',     icon:'🌀'},
+];
+
+const TONES = [
+  {id:'melodramatico', label:'Melodramático puro'},
+  {id:'comico',        label:'Cómico exagerado'},
+  {id:'trash',         label:'Trash TV ridículo'},
+  {id:'oscuro',        label:'Oscuro y retorcido'},
+];
+
+async function callGemini(apiKey, prompt, useWebSearch=false){
+  const model = 'gemini-2.5-flash';
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+  const body = {
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: { temperature: 0.95, maxOutputTokens: 2500 },
+  };
+  if(useWebSearch){
+    body.tools = [{ googleSearch: {} }];
+  }
+  const res = await fetch(url, {
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-goog-api-key': apiKey,
+    },
+    body: JSON.stringify(body),
+  });
+  if(!res.ok){
+    const err = await res.text();
+    throw new Error('Gemini ' + res.status + ': ' + err.slice(0,300));
+  }
+  const data = await res.json();
+  const parts = data?.candidates?.[0]?.content?.parts || [];
+  return parts.map(p => p.text || '').join('\n').trim();
+}
+
+function CopyBtn({ text }){
+  const [done, setDone] = useState(false);
+  return html`<button class="copy" onClick=${()=>{
+    navigator.clipboard.writeText(text);
+    setDone(true);
+    setTimeout(()=>setDone(false),1500);
+  }}>${done?'✓ Copiado':'⧉ Copiar'}</button>`;
+}
+
+function Panel({ title, subtitle, empty, emptyMsg, content, accent, next, extra }){
+  return html`
+    <div>
+      <div class="row">
+        <div>
+          <h3 class="panel-title">${title}</h3>
+          ${subtitle && html`<p class="panel-sub">${subtitle}</p>`}
+        </div>
+        ${content && html`<${CopyBtn} text=${content} />`}
+      </div>
+      ${empty
+        ? html`<div class="empty">
+            ${emptyMsg}
+            ${extra && html`<div style="margin-top:22px">${extra}</div>`}
+          </div>`
+        : html`
+          <div class="out ${accent||'pink'}">${content}</div>
+          ${next}
+        `}
+    </div>
+  `;
+}
+
+function ApiKeyModal({ onSave }){
+  const [val, setVal] = useState('');
+  return html`<div class="modal-bg">
+    <div class="modal">
+      <span class="free-badge">100% GRATIS · SIN TARJETA</span>
+      <h2>Tu API key de Gemini</h2>
+      <p>Para que el estudio funcione, necesitas tu propia API key gratuita de Google Gemini. <strong>No es de pago</strong>, no te piden tarjeta y tienes 1.500 generaciones al día gratis.</p>
+      <p><strong>Pasos (2 minutos):</strong></p>
+      <ol>
+        <li>Abre <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a></li>
+        <li>Inicia sesión con tu Google</li>
+        <li>Toca <strong>"Create API key"</strong></li>
+        <li>Copia la key (empieza con <code>AIza...</code>)</li>
+        <li>Pégala aquí abajo ↓</li>
+      </ol>
+      <input
+        type="password"
+        placeholder="AIza..."
+        value=${val}
+        onInput=${e=>setVal(e.target.value)}
+      />
+      <button class="btn btn-pink" style="width:100%" onClick=${()=>val.trim() && onSave(val.trim())} disabled=${!val.trim()}>
+        Guardar y empezar
+      </button>
+      <p class="warn">⚠️ Tu key se guarda solo en TU navegador (localStorage). No la subas a sitios públicos ni la compartas.</p>
+    </div>
+  </div>`;
+}
+
+function App(){
+  const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_key') || '');
+  const [tab, setTab] = useState('idea');
+
+  const [pickedFruits, setPickedFruits] = useState(['🍓 Fresa','🥭 Mango']);
+  const [drama, setDrama] = useState('infidelidad');
+  const [tone, setTone] = useState('melodramatico');
+
+  const [idea, setIdea] = useState(null);
+  const [script, setScript] = useState(null);
+  const [scenes, setScenes] = useState(null);
+  const [videos, setVideos] = useState(null);
+  const [trends, setTrends] = useState(null);
+
+  const [loading, setLoading] = useState({});
+  const setL = (k,v)=>setLoading(p=>({...p,[k]:v}));
+
+  const saveKey = (k)=>{
+    localStorage.setItem('gemini_key', k);
+    setApiKey(k);
+  };
+  const clearKey = ()=>{
+    if(confirm('¿Borrar tu API key de este navegador?')){
+      localStorage.removeItem('gemini_key');
+      setApiKey('');
+    }
+  };
+
+  const toggleFruit = (f)=>{
+    setPickedFruits(p => p.includes(f)
+      ? p.filter(x=>x!==f)
+      : [...p, f].slice(0,4));
+  };
+
+  const runOrError = async (key, fn) => {
+    setL(key, true);
+    try { await fn(); }
+    catch(e){
+      alert('Error: ' + e.message + '\n\nRevisa tu API key en aistudio.google.com/apikey');
+    }
+    setL(key, false);
+  };
+
+  const genIdea = () => runOrError('idea', async ()=>{
+    if(pickedFruits.length < 2) return;
+    const dramaLabel = DRAMAS.find(d=>d.id===drama).label;
+    const toneLabel = TONES.find(t=>t.id===tone).label;
+    const prompt = `Eres guionista experto en FRUTINOVELAS virales para TikTok/Reels (vídeos de 30-60s con frutas antropomorfizadas en dramas de telenovela latina, formato AI-generated).
+
+Crea UNA idea ALTAMENTE viral con estos parámetros:
+- Personajes: ${pickedFruits.join(', ')}
+- Tipo de drama: ${dramaLabel}
+- Tono: ${toneLabel}
+
+Devuelve EXACTAMENTE este formato sin texto extra ni markdown:
+
+TÍTULO: [título dramático en mayúsculas tipo telenovela, máximo 6 palabras]
+
+LOGLINE: [una frase impactante de máximo 25 palabras que enganche]
+
+HOOK VIRAL (primeros 3 segundos): [línea exacta que se dice en el primer plano, debe ser un cliffhanger imposible de ignorar]
+
+PERSONAJES:
+${pickedFruits.map(f=>`- ${f}: [personalidad + rol en la trama en 1 línea]`).join('\n')}
+
+GIRO FINAL: [el plot twist que cierra el vídeo y deja al espectador en shock]
+
+POR QUÉ FUNCIONA: [3 razones cortas de por qué será viral]`;
+    const r = await callGemini(apiKey, prompt);
+    setIdea(r); setScript(null); setScenes(null); setVideos(null);
+    setTab('idea');
+  });
+
+  const genScript = () => runOrError('script', async ()=>{
+    if(!idea) return;
+    const prompt = `Basándote en esta idea de frutinovela, escribe el GUIÓN COMPLETO para un video de 45-60 segundos:
+
+${idea}
+
+Formato obligatorio (sin markdown):
+
+ESCENA 1 (0-5s) — [descripción visual ultra corta]
+🍓 PERSONAJE: "diálogo dramático corto"
+
+ESCENA 2 (5-15s) — [descripción]
+🥭 PERSONAJE: "diálogo"
+
+(Continúa con 5-7 escenas en total, cada una con timing claro hasta llegar al plot twist final)
+
+REGLAS:
+- Diálogos cortos, melodramáticos, latinos
+- Cada escena con descripción visual de UNA línea
+- Usa los emojis de los personajes
+- El plot twist debe estar en la última escena
+- Total: 45-60 segundos`;
+    const r = await callGemini(apiKey, prompt);
+    setScript(r); setTab('script');
+  });
+
+  const genScenes = () => runOrError('scenes', async ()=>{
+    if(!script) return;
+    const prompt = `Basándote en este guión de frutinovela, crea PROMPTS DE IMAGEN ultra-detallados en INGLÉS para cada escena, optimizados para Midjourney/Flux/Sora/Imagen.
+
+${script}
+
+Para cada escena devuelve este formato exacto (sin markdown):
+
+===ESCENA 1===
+PROMPT: [prompt en inglés, 40-60 palabras, incluye: anthropomorphic fruit characters with expressive faces, telenovela cinematic style, dramatic lighting, soap opera aesthetic, tropical color palette, 9:16 aspect ratio, hyperrealistic, emotional close-up, etc.]
+NEGATIVE: [qué evitar: ugly, distorted, low quality, etc.]
+
+===ESCENA 2===
+PROMPT: ...
+NEGATIVE: ...
+
+(Repite para TODAS las escenas del guión. Mantén consistencia visual entre escenas: misma iluminación, mismo estilo de personajes.)`;
+    const r = await callGemini(apiKey, prompt);
+    setScenes(r); setTab('scenes');
+  });
+
+  const genVideos = () => runOrError('videos', async ()=>{
+    if(!script) return;
+    const prompt = `Basándote en este guión de frutinovela, crea PROMPTS DE VIDEO en INGLÉS para Veo 3/Kling/Runway/Sora.
+
+${script}
+
+Para cada escena devuelve este formato exacto (sin markdown):
+
+===VIDEO ESCENA 1===
+PROMPT: [prompt en inglés de 50-80 palabras describiendo: movimiento de cámara específico (dolly in, push in, handheld), expresiones faciales de las frutas, gesto/acción exacta, audio/diálogo en español, ambient sound, telenovela cinematic style, vertical 9:16]
+CAMERA: [tipo de plano: extreme close-up, medium shot, etc.]
+DURATION: [duración en segundos]
+DIALOGUE (es): "[diálogo exacto en español que pronuncia el personaje]"
+
+===VIDEO ESCENA 2===
+...
+
+(Para TODAS las escenas. Los prompts deben ser ejecutables tal cual en Veo 3 o Kling.)`;
+    const r = await callGemini(apiKey, prompt);
+    setVideos(r); setTab('videos');
+  });
+
+  const genTrends = () => runOrError('trends', async ()=>{
+    const prompt = `Busca en la web AHORA MISMO contenido viral de "frutinovelas" en TikTok, Instagram Reels y YouTube Shorts. Analiza qué está funcionando esta semana.
+
+Devuelve este informe en ESPAÑOL (sin markdown, texto plano):
+
+🔥 TENDENCIAS DE LA SEMANA
+- [3-5 bullets sobre qué tramas/formatos están explotando ahora]
+
+📈 HOOKS QUE FUNCIONAN
+- [3-4 ejemplos reales de primeras líneas virales que has encontrado]
+
+🎬 FORMATOS GANADORES
+- [duración óptima, ritmo, estructura que más views está dando]
+
+🍓 FRUTAS Y PAREJAS HOT
+- [qué frutas y combinaciones están dominando]
+
+⚠️ QUÉ EVITAR
+- [2-3 cosas saturadas que ya no funcionan]
+
+💡 OPORTUNIDAD AHORA
+- [1 ángulo poco explotado que podrías atacar tú esta semana]
+
+Sé específico, cita lo que encuentres en la búsqueda, sin inventar.`;
+    const r = await callGemini(apiKey, prompt, true);
+    setTrends(r); setTab('trends');
+  });
+
+  if(!apiKey){
+    return html`<${ApiKeyModal} onSave=${saveKey} />`;
+  }
+
+  const tabs = [
+    {id:'idea',   label:'Idea',       has:!!idea},
+    {id:'script', label:'Guión',      has:!!script},
+    {id:'scenes', label:'Imágenes',   has:!!scenes},
+    {id:'videos', label:'Vídeo',      has:!!videos},
+    {id:'trends', label:'Tendencias', has:!!trends},
+  ];
+
+  return html`
+    <button class="key-btn" onClick=${clearKey}>⚙ Cambiar API key</button>
+
+    <div class="wrap">
+      <header>
+        <div>
+          <span class="stamp" style="color:var(--gold)">EN VIVO · 2026</span>
+          <span class="stamp" style="color:var(--magenta)">RATED · 🍓 DRAMÁTICO</span>
+        </div>
+        <h1 class="title">Fruti<span class="pink">novelas</span><span class="gold">Studio</span></h1>
+        <p class="sub">Tu estudio para crear frutinovelas virales: idea, guión, prompts de imagen y vídeo, y análisis de tendencias <span class="pink">en tiempo real</span>.</p>
+      </header>
+
+      <section class="panel">
+        <h2>🎭 Reparto y trama</h2>
+
+        <p class="panel-lbl">Elige 2–4 personajes · seleccionados: ${pickedFruits.length}</p>
+        <div class="chips">
+          ${FRUITS.map(f => {
+            const on = pickedFruits.includes(f);
+            return html`<button class=${"chip"+(on?" on-pink":"")} onClick=${()=>toggleFruit(f)}>${f}</button>`;
+          })}
+        </div>
+
+        <p class="panel-lbl">Tipo de drama</p>
+        <div class="chips">
+          ${DRAMAS.map(d => html`<button class=${"chip"+(drama===d.id?" on-gold":"")} onClick=${()=>setDrama(d.id)}>${d.icon} ${d.label}</button>`)}
+        </div>
+
+        <p class="panel-lbl">Tono</p>
+        <div class="chips">
+          ${TONES.map(t => html`<button class=${"chip"+(tone===t.id?" on-cream":"")} onClick=${()=>setTone(t.id)}>${t.label}</button>`)}
+        </div>
+
+        <button class="btn btn-pink" onClick=${genIdea} disabled=${loading.idea || pickedFruits.length<2}>
+          ${loading.idea ? html`<span class="spin"></span>` : '🔥'} Generar idea viral →
+        </button>
+      </section>
+
+      <div class="tabs">
+        ${tabs.map(t => html`
+          <button class=${"tab"+(tab===t.id?" active":"")} onClick=${()=>setTab(t.id)}>
+            ${t.label} ${t.has && html`<span class="dot"></span>`}
+          </button>
+        `)}
+      </div>
+
+      <main>
+        ${tab==='idea' && html`<${Panel}
+          title="La idea"
+          empty=${!idea}
+          emptyMsg="Configura el reparto arriba y pulsa 'Generar idea viral'."
+          content=${idea}
+          accent="pink"
+          next=${idea && html`<div style="margin-top:20px"><button class="btn btn-pink" onClick=${genScript} disabled=${loading.script}>${loading.script?html`<span class="spin"></span>`:'⚡'} Generar guión →</button></div>`}
+        />`}
+
+        ${tab==='script' && html`<${Panel}
+          title="El guión"
+          empty=${!script}
+          emptyMsg="Primero genera una idea."
+          content=${script}
+          accent="pink"
+          extra=${idea && !script && html`<button class="btn btn-pink" onClick=${genScript} disabled=${loading.script}>${loading.script?html`<span class="spin"></span>`:'✍️'} Generar guión ahora</button>`}
+          next=${script && html`<div style="margin-top:20px"><button class="btn btn-gold" onClick=${genScenes} disabled=${loading.scenes}>${loading.scenes?html`<span class="spin"></span>`:'🎨'} Generar prompts de imagen →</button></div>`}
+        />`}
+
+        ${tab==='scenes' && html`<${Panel}
+          title="Prompts de imagen"
+          empty=${!scenes}
+          emptyMsg="Primero necesitas un guión generado."
+          content=${scenes}
+          accent="gold"
+          extra=${script && !scenes && html`<button class="btn btn-gold" onClick=${genScenes} disabled=${loading.scenes}>${loading.scenes?html`<span class="spin"></span>`:'🎨'} Generar prompts de imagen</button>`}
+          next=${scenes && html`<div style="margin-top:20px"><button class="btn btn-orange" onClick=${genVideos} disabled=${loading.videos}>${loading.videos?html`<span class="spin"></span>`:'🎬'} Generar prompts de vídeo →</button></div>`}
+        />`}
+
+        ${tab==='videos' && html`<${Panel}
+          title="Prompts de vídeo"
+          empty=${!videos}
+          emptyMsg="Necesitas un guión para generar los prompts de vídeo."
+          content=${videos}
+          accent="orange"
+          extra=${script && !videos && html`<button class="btn btn-orange" onClick=${genVideos} disabled=${loading.videos}>${loading.videos?html`<span class="spin"></span>`:'🎬'} Generar prompts de vídeo</button>`}
+        />`}
+
+        ${tab==='trends' && html`<${Panel}
+          title="Análisis viral en tiempo real"
+          subtitle="Buscamos en Google ahora mismo"
+          empty=${!trends}
+          emptyMsg="Pulsa abajo para analizar qué frutinovelas están explotando esta semana."
+          content=${trends}
+          accent="pink"
+          extra=${html`<button class="btn btn-pink" onClick=${genTrends} disabled=${loading.trends}>${loading.trends?html`<span class="spin"></span> Escaneando la web…`:`👁 ${trends?'Volver a analizar':'Analizar tendencias ahora'}`}</button>`}
+        />`}
+      </main>
+
+      <footer>
+        <span>Frutinovelas Studio · Powered by Gemini</span>
+        <span class="it">♥ Hecho para creadores virales</span>
+      </footer>
+    </div>
+  `;
+}
+
+render(h(App), document.getElementById('app'));
+</script>
+</body>
+</html>
