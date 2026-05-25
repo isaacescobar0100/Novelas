@@ -1,0 +1,1010 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Frutinovelas Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,700;1,9..144,900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#14060e; --ink2:#2a0a1f;
+    --cream:#fef6e4;
+    --magenta:#e91e63;
+    --gold:#f5b800;
+    --orange:#ff6b35;
+    --line:rgba(254,246,228,.22);
+    --muted:rgba(254,246,228,.65);
+    --faint:rgba(254,246,228,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'DM Sans',system-ui,sans-serif;
+    color:var(--cream);
+    background:radial-gradient(ellipse at top left,#2a0a1f 0%,#14060e 45%,#0a0408 100%) fixed;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .grain{position:fixed;inset:0;pointer-events:none;opacity:.08;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+  .wrap{position:relative;max-width:1000px;margin:0 auto;padding:80px 18px 80px;}
+  @media(min-width:700px){.wrap{padding:90px 32px 80px;}}
+  .stamp{display:inline-block;padding:4px 10px;font-size:10px;letter-spacing:.25em;
+    text-transform:uppercase;border:1px solid currentColor;transform:rotate(-2deg);
+    margin-right:8px;}
+  h1.title{font-family:'Fraunces',serif;font-style:italic;font-weight:900;
+    font-variation-settings:"opsz" 144,"SOFT" 100,"WONK" 1;
+    font-size:clamp(3rem,9vw,6.5rem);line-height:.85;letter-spacing:-.04em;
+    margin:14px 0 0;color:var(--cream);}
+  h1.title .pink{color:var(--magenta)}
+  h1.title .gold{color:var(--gold);font-style:italic;display:block}
+  .sub{margin:20px 0 0;max-width:520px;font-size:17px;font-style:italic;color:var(--muted)}
+  .sub .pink{color:var(--magenta);font-style:normal}
+
+  .context-bar{
+    margin-top:24px;padding:14px 16px;
+    background:rgba(245,184,0,.12);
+    border:1px solid rgba(245,184,0,.4);
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  }
+  .context-bar .label{font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);font-weight:700;}
+  .context-bar .name{font-family:'Fraunces',serif;font-style:italic;font-size:18px;color:var(--cream);flex:1;}
+  .context-bar .ep{font-size:12px;color:var(--muted);}
+  .context-bar button{background:transparent;border:1px solid rgba(245,184,0,.5);
+    color:var(--gold);padding:6px 10px;font-size:10px;letter-spacing:.2em;
+    text-transform:uppercase;cursor:pointer;font-family:inherit;font-weight:700;}
+
+  .toast{position:fixed;bottom:20px;left:20px;right:20px;max-width:500px;margin:0 auto;
+    padding:14px 18px;background:var(--ink2);border:1px solid var(--magenta);
+    color:var(--cream);font-size:14px;z-index:60;box-shadow:0 10px 40px rgba(233,30,99,.4);}
+  .toast .toast-title{font-weight:700;margin-bottom:4px;}
+  .toast button{background:transparent;border:0;color:var(--gold);font-size:18px;
+    position:absolute;top:8px;right:12px;cursor:pointer;}
+
+  .panel{padding:22px;margin-top:36px;background:rgba(254,246,228,.04);
+    border:1px solid var(--line);backdrop-filter:blur(8px);}
+  @media(min-width:700px){.panel{padding:28px}}
+  .panel h2{font-size:11px;letter-spacing:.3em;text-transform:uppercase;
+    color:var(--faint);margin:0 0 18px;display:flex;align-items:center;gap:8px;}
+  .panel-lbl{font-size:12px;color:var(--faint);margin:0 0 10px}
+  .panel.locked{opacity:.55;pointer-events:none;}
+  .locked-note{padding:12px;background:rgba(245,184,0,.1);border:1px dashed rgba(245,184,0,.4);color:var(--gold);font-size:13px;margin-bottom:18px;font-style:italic;pointer-events:auto;}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+  .chip{padding:9px 13px;font-size:14px;background:transparent;color:var(--muted);
+    border:1px solid var(--line);cursor:pointer;font-family:inherit;transition:.15s;}
+  .chip:hover{border-color:var(--cream)}
+  .chip.on-pink{background:var(--magenta);color:var(--cream);border-color:var(--magenta);font-weight:700}
+  .chip.on-gold{background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:700}
+  .chip.on-cream{background:var(--cream);color:var(--ink);border-color:var(--cream);font-weight:700}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:14px 26px;font-size:13px;letter-spacing:.2em;text-transform:uppercase;
+    font-weight:700;cursor:pointer;border:0;font-family:inherit;transition:.15s;}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .btn-pink{background:var(--magenta);color:var(--cream)}
+  .btn-gold{background:var(--gold);color:var(--ink)}
+  .btn-orange{background:var(--orange);color:var(--ink)}
+  .btn-ghost{background:transparent;color:var(--cream);border:1px solid var(--line)}
+  .btn-saga{background:#7a1a52;color:var(--cream);}
+
+  .tabs{position:sticky;top:0;z-index:3;display:flex;flex-wrap:wrap;gap:2px;
+    padding:14px 0;margin:30px -18px 24px;padding-left:18px;padding-right:18px;
+    background:linear-gradient(to bottom,#14060e 70%,transparent 100%);}
+  @media(min-width:700px){.tabs{margin-left:0;margin-right:0;padding-left:0;padding-right:0;}}
+  .tab{display:flex;align-items:center;gap:8px;padding:9px 12px;font-size:12px;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--faint);cursor:pointer;
+    background:transparent;border:0;border-bottom:2px solid transparent;font-family:inherit;}
+  .tab.active{color:var(--gold);border-color:var(--gold);font-weight:700}
+  .tab .dot{width:6px;height:6px;border-radius:50%;background:var(--magenta);}
+
+  h3.panel-title{font-family:'Fraunces',serif;font-style:italic;font-weight:700;
+    font-size:clamp(2rem,5vw,3rem);line-height:1;letter-spacing:-.02em;
+    margin:0 0 18px;color:var(--cream)}
+  .panel-sub{font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--faint);margin-top:-12px;margin-bottom:18px}
+
+  .out{padding:24px;white-space:pre-wrap;font-size:15px;line-height:1.65;
+    background:var(--cream);color:var(--ink);box-shadow:0 20px 60px -20px rgba(233,30,99,.3);}
+  .out.pink{border-left:4px solid var(--magenta)}
+  .out.gold{border-left:4px solid var(--gold)}
+  .out.orange{border-left:4px solid var(--orange)}
+  .out.hook{
+    background:linear-gradient(135deg,#fef6e4 0%,#fff8dc 100%);
+    border-left:6px solid var(--magenta);
+    border-right:6px solid var(--gold);
+    font-size:16px;
+    box-shadow:0 30px 80px -20px rgba(233,30,99,.5);
+    position:relative;
+  }
+  .out.hook::before{
+    content:'🎣 HOOK VIRAL';
+    position:absolute;top:-12px;left:20px;
+    background:var(--magenta);color:var(--cream);
+    padding:4px 12px;font-size:10px;letter-spacing:.3em;font-weight:700;
+  }
+
+  .empty{padding:42px 22px;text-align:center;color:var(--faint);font-style:italic;
+    border:1px dashed var(--line);}
+
+  .row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+
+  .copy{display:inline-flex;align-items:center;gap:6px;font-size:11px;
+    letter-spacing:.2em;text-transform:uppercase;padding:7px 12px;
+    background:transparent;color:inherit;border:1px solid currentColor;
+    cursor:pointer;font-family:inherit;opacity:.8;}
+  .copy:hover{opacity:1}
+
+  .spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;
+    border-right-color:transparent;border-radius:50%;animation:s 1s linear infinite}
+  @keyframes s{to{transform:rotate(360deg)}}
+
+  .top-bar{position:fixed;top:14px;left:14px;right:14px;z-index:4;display:flex;justify-content:space-between;gap:8px;}
+  .top-btn{background:rgba(254,246,228,.08);
+    border:1px solid var(--line);color:var(--muted);padding:8px 12px;font-size:11px;
+    letter-spacing:.15em;text-transform:uppercase;cursor:pointer;font-family:inherit;
+    backdrop-filter:blur(8px);font-weight:700;}
+  .top-btn:hover{color:var(--cream)}
+  .top-btn .badge{display:inline-block;background:var(--magenta);color:var(--cream);
+    padding:1px 6px;margin-left:6px;font-size:10px;}
+
+  .modal-bg{position:fixed;inset:0;background:rgba(10,4,8,.85);backdrop-filter:blur(12px);
+    display:flex;align-items:center;justify-content:center;z-index:50;padding:20px;}
+  .modal{max-width:560px;width:100%;background:var(--ink2);border:1px solid var(--line);padding:28px;max-height:90vh;overflow-y:auto;position:relative;}
+  .modal h2{font-family:'Fraunces',serif;font-style:italic;font-size:28px;margin:0 0 14px;color:var(--gold);font-weight:700}
+  .modal p{color:var(--muted);font-size:14px;line-height:1.55;margin:0 0 14px}
+  .modal a{color:var(--magenta);text-decoration:underline}
+  .modal input{width:100%;padding:12px 14px;background:var(--ink);border:1px solid var(--line);
+    color:var(--cream);font-family:'DM Mono',monospace;font-size:13px;margin-bottom:14px;}
+  .modal input:focus{outline:1px solid var(--magenta);border-color:var(--magenta)}
+  .modal .warn{font-size:12px;color:var(--faint);font-style:italic;margin-top:10px}
+  .modal ol{color:var(--muted);font-size:13px;padding-left:20px;line-height:1.7}
+  .modal-close{position:absolute;top:18px;right:18px;background:transparent;border:0;color:var(--cream);font-size:24px;cursor:pointer;}
+
+  .free-badge{display:inline-block;padding:3px 8px;background:var(--gold);color:var(--ink);font-size:10px;letter-spacing:.2em;font-weight:700;margin-bottom:12px;}
+
+  .saga-item{padding:14px;background:rgba(254,246,228,.04);border:1px solid var(--line);margin-bottom:10px;}
+  .saga-item .saga-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px;}
+  .saga-item .saga-title{font-family:'Fraunces',serif;font-style:italic;font-size:18px;color:var(--cream);font-weight:700;}
+  .saga-item .saga-meta{font-size:11px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
+  .saga-item .saga-del{background:transparent;border:1px solid rgba(255,107,53,.4);color:var(--orange);
+    padding:4px 8px;font-size:10px;cursor:pointer;font-family:inherit;letter-spacing:.15em;text-transform:uppercase;}
+  .ep-item{padding:8px 10px;background:rgba(254,246,228,.04);border-left:2px solid var(--magenta);
+    margin-bottom:4px;cursor:pointer;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .ep-item:hover{background:rgba(254,246,228,.1);}
+  .ep-item.current{background:rgba(245,184,0,.15);border-left-color:var(--gold);}
+  .ep-item .ep-num{font-weight:700;color:var(--gold);}
+  .ep-item .ep-stat{font-size:10px;color:var(--faint);}
+  .ep-add{margin-top:8px;background:transparent;border:1px dashed var(--line);color:var(--muted);
+    padding:8px;width:100%;cursor:pointer;font-family:inherit;font-size:12px;letter-spacing:.15em;text-transform:uppercase;}
+  .ep-add:hover{color:var(--cream);border-color:var(--cream);}
+
+  footer{font-size:12px;color:var(--faint);padding-top:30px;margin-top:40px;
+    border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+  footer .it{font-style:italic}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div id="app"></div>
+
+<script type="module">
+import { h, render } from 'https://esm.sh/preact@10.22.0';
+import { useState, useEffect } from 'https://esm.sh/preact@10.22.0/hooks';
+import htm from 'https://esm.sh/htm@3.1.1';
+const html = htm.bind(h);
+
+const FRUITS = ['🍓 Fresa','🥭 Mango','🍍 Piña','🍎 Manzana','🍐 Pera','🍉 Sandía','🍊 Naranja','🍋 Limón','🍌 Plátano','🍇 Uva','🥥 Coco','🥝 Kiwi','🥑 Aguacate','🍑 Cereza','🫐 Arándano','🍒 Guinda'];
+
+const DRAMAS = [
+  {id:'infidelidad', label:'Infidelidad',         icon:'💔'},
+  {id:'venganza',    label:'Venganza',            icon:'🗡️'},
+  {id:'secreto',     label:'Secreto familiar',    icon:'🤫'},
+  {id:'amor',        label:'Amor prohibido',      icon:'💋'},
+  {id:'herencia',    label:'Herencia perdida',    icon:'💰'},
+  {id:'identidad',   label:'Identidad oculta',    icon:'🎭'},
+  {id:'gemelo',      label:'Gemelo malvado',      icon:'👯'},
+  {id:'embarazo',    label:'Embarazo sorpresa',   icon:'🤰'},
+  {id:'traicion',    label:'Traición de amiga',   icon:'🥀'},
+  {id:'amnesia',     label:'Amnesia trágica',     icon:'🌀'},
+];
+
+const TONES = [
+  {id:'melodramatico', label:'Melodramático puro'},
+  {id:'comico',        label:'Cómico exagerado'},
+  {id:'trash',         label:'Trash TV ridículo'},
+  {id:'oscuro',        label:'Oscuro y retorcido'},
+];
+
+// ────── GEMINI API con auto-fallback ──────
+const MODELS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
+
+async function callOneModel(apiKey, model, prompt, useWebSearch){
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+  const body = {
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: { temperature: 0.95, maxOutputTokens: 3500 },
+  };
+  if(useWebSearch){ body.tools = [{ googleSearch: {} }]; }
+  const res = await fetch(url, {
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-goog-api-key': apiKey},
+    body: JSON.stringify(body),
+  });
+  if(!res.ok){
+    const err = await res.text();
+    const error = new Error('Gemini ' + res.status + ': ' + err.slice(0,250));
+    error.status = res.status;
+    error.transient = res.status === 503 || res.status === 429 || res.status === 500;
+    throw error;
+  }
+  const data = await res.json();
+  const parts = data?.candidates?.[0]?.content?.parts || [];
+  return parts.map(p => p.text || '').join('\n').trim();
+}
+
+async function callGemini(apiKey, prompt, useWebSearch=false, onFallback){
+  let lastErr;
+  for(let i = 0; i < MODELS.length; i++){
+    const model = MODELS[i];
+    try {
+      const r = await callOneModel(apiKey, model, prompt, useWebSearch);
+      if(i > 0 && onFallback) onFallback(model);
+      return r;
+    } catch(e){
+      lastErr = e;
+      if(!e.transient) throw e;
+      // Espera breve antes del siguiente modelo
+      await new Promise(r => setTimeout(r, 1200));
+    }
+  }
+  throw lastErr;
+}
+
+// ────── HELPERS ──────
+const newId = () => Math.random().toString(36).slice(2,9);
+
+function downloadTxt(filename, content){
+  const blob = new Blob([content], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+
+function getSagaTitle(idea){
+  const m = idea?.match(/TÍTULO:\s*(.+)/i);
+  return m ? m[1].trim() : null;
+}
+
+// ────── UI COMPONENTS ──────
+function CopyBtn({ text }){
+  const [done, setDone] = useState(false);
+  return html`<button class="copy" onClick=${()=>{
+    navigator.clipboard.writeText(text);
+    setDone(true); setTimeout(()=>setDone(false),1500);
+  }}>${done?'✓ Copiado':'⧉ Copiar'}</button>`;
+}
+
+function Panel({ title, subtitle, empty, emptyMsg, content, accent, next, extra }){
+  return html`
+    <div>
+      <div class="row">
+        <div>
+          <h3 class="panel-title">${title}</h3>
+          ${subtitle && html`<p class="panel-sub">${subtitle}</p>`}
+        </div>
+        ${content && html`<${CopyBtn} text=${content} />`}
+      </div>
+      ${empty
+        ? html`<div class="empty">
+            ${emptyMsg}
+            ${extra && html`<div style="margin-top:22px">${extra}</div>`}
+          </div>`
+        : html`<div class="out ${accent||'pink'}">${content}</div>${next}`}
+    </div>`;
+}
+
+function Toast({ message, onClose }){
+  return html`<div class="toast">
+    <div class="toast-title">⚠️ Aviso</div>
+    <div>${message}</div>
+    <button onClick=${onClose}>×</button>
+  </div>`;
+}
+
+function ApiKeyModal({ onSave }){
+  const [val, setVal] = useState('');
+  return html`<div class="modal-bg">
+    <div class="modal">
+      <span class="free-badge">100% GRATIS · SIN TARJETA</span>
+      <h2>Tu API key de Gemini</h2>
+      <p>Necesitas tu propia API key gratuita de Google Gemini. <strong>No es de pago</strong>, no piden tarjeta y tienes 1.500 generaciones al día gratis.</p>
+      <p><strong>Pasos (2 minutos):</strong></p>
+      <ol>
+        <li>Abre <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a></li>
+        <li>Inicia sesión con tu Google</li>
+        <li>Toca <strong>"Create API key"</strong></li>
+        <li>Copia la key (empieza con <code>AIza...</code>)</li>
+        <li>Pégala aquí abajo ↓</li>
+      </ol>
+      <input type="password" placeholder="AIza..." value=${val} onInput=${e=>setVal(e.target.value)} />
+      <button class="btn btn-pink" style="width:100%" onClick=${()=>val.trim()&&onSave(val.trim())} disabled=${!val.trim()}>Guardar y empezar</button>
+      <p class="warn">⚠️ Tu key se guarda solo en TU navegador (localStorage).</p>
+    </div>
+  </div>`;
+}
+
+function SagasModal({ sagas, currentSagaId, currentEpisodeId, onClose, onLoad, onAddEpisode, onDelete, onNew }){
+  return html`<div class="modal-bg" onClick=${(e)=>e.target===e.currentTarget&&onClose()}>
+    <div class="modal">
+      <button class="modal-close" onClick=${onClose}>×</button>
+      <h2>Mis sagas</h2>
+      <p>Todas tus frutinovelas guardadas en este navegador. Toca un episodio para abrirlo, o crea uno nuevo dentro de la saga.</p>
+      ${sagas.length === 0 && html`<div class="empty" style="margin-bottom:14px">Aún no tienes ninguna saga. Cierra esta ventana y genera tu primera idea.</div>`}
+      ${sagas.map(saga => html`
+        <div class="saga-item">
+          <div class="saga-row">
+            <div>
+              <div class="saga-title">${saga.name}</div>
+              <div class="saga-meta">${saga.fruits.join(' · ')} · ${saga.episodes.length} ep${saga.episodes.length===1?'':'s'}</div>
+            </div>
+            <button class="saga-del" onClick=${()=>{if(confirm('¿Borrar la saga "'+saga.name+'"?')) onDelete(saga.id);}}>Borrar</button>
+          </div>
+          ${saga.episodes.map(ep => {
+            const isCur = saga.id===currentSagaId && ep.id===currentEpisodeId;
+            const status = [
+              ep.idea?'💡':'',
+              ep.hook?'🎣':'',
+              ep.script?'📝':'',
+              ep.scenes?'🎨':'',
+              ep.videos?'🎬':''
+            ].filter(Boolean).join(' ') || '(vacío)';
+            return html`<div class="ep-item ${isCur?'current':''}" onClick=${()=>{onLoad(saga.id, ep.id); onClose();}}>
+              <span><span class="ep-num">Ep ${ep.number}</span> · ${ep.title || 'Sin título'}</span>
+              <span class="ep-stat">${status}</span>
+            </div>`;
+          })}
+          <button class="ep-add" onClick=${()=>{onAddEpisode(saga.id); onClose();}}>+ Nuevo episodio</button>
+        </div>
+      `)}
+      <button class="btn btn-pink" style="width:100%;margin-top:14px" onClick=${()=>{onNew(); onClose();}}>+ Empezar saga NUEVA</button>
+    </div>
+  </div>`;
+}
+
+// ────── APP ──────
+function App(){
+  const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_key') || '');
+  const [tab, setTab] = useState('idea');
+  const [toast, setToast] = useState(null);
+
+  const [pickedFruits, setPickedFruits] = useState(['🍓 Fresa','🥭 Mango']);
+  const [drama, setDrama] = useState('infidelidad');
+  const [tone, setTone] = useState('melodramatico');
+
+  const [sagas, setSagas] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('frutinovelas_sagas') || '[]'); }
+    catch { return []; }
+  });
+  const [currentSagaId, setCurrentSagaId] = useState(null);
+  const [currentEpisodeId, setCurrentEpisodeId] = useState(null);
+  const [showSagas, setShowSagas] = useState(false);
+
+  const [trends, setTrends] = useState(null);
+  const [loading, setLoading] = useState({});
+  const setL = (k,v) => setLoading(p=>({...p,[k]:v}));
+
+  useEffect(() => {
+    localStorage.setItem('frutinovelas_sagas', JSON.stringify(sagas));
+  }, [sagas]);
+
+  // Cleanup: borrar sagas con episodios completamente vacíos al cargar
+  useEffect(() => {
+    const cleaned = sagas.map(s => ({
+      ...s,
+      episodes: s.episodes.filter(e => e.idea || e.hook || e.script || e.scenes || e.videos)
+    })).filter(s => s.episodes.length > 0);
+    if(JSON.stringify(cleaned) !== JSON.stringify(sagas)){
+      setSagas(cleaned);
+    }
+    // eslint-disable-next-line
+  }, []);
+
+  const currentSaga = sagas.find(s => s.id === currentSagaId);
+  const currentEpisode = currentSaga?.episodes.find(e => e.id === currentEpisodeId);
+  const isContinuing = currentSaga && currentEpisode && currentEpisode.number > 1;
+
+  const idea    = currentEpisode?.idea    || null;
+  const hook    = currentEpisode?.hook    || null;
+  const script  = currentEpisode?.script  || null;
+  const scenes  = currentEpisode?.scenes  || null;
+  const videos  = currentEpisode?.videos  || null;
+
+  const saveKey = (k) => { localStorage.setItem('gemini_key', k); setApiKey(k); };
+  const clearKey = () => {
+    if(confirm('¿Borrar tu API key de este navegador?')){
+      localStorage.removeItem('gemini_key'); setApiKey('');
+    }
+  };
+
+  const toggleFruit = (f) => {
+    if(isContinuing) return;
+    setPickedFruits(p => p.includes(f) ? p.filter(x=>x!==f) : [...p, f].slice(0,4));
+  };
+
+  const showFallbackToast = (model) => {
+    setToast('Gemini Flash saturado. Usando '+model+' como respaldo. Sigue funcionando.');
+    setTimeout(()=>setToast(null), 5000);
+  };
+
+  // ─── Saga management ───
+  const startNewSaga = () => {
+    setCurrentSagaId(null);
+    setCurrentEpisodeId(null);
+    setTab('idea');
+    window.scrollTo(0,0);
+  };
+
+  const deleteSaga = (sagaId) => {
+    setSagas(prev => prev.filter(s => s.id !== sagaId));
+    if(currentSagaId === sagaId){
+      setCurrentSagaId(null); setCurrentEpisodeId(null);
+    }
+  };
+
+  const loadEpisode = (sagaId, episodeId) => {
+    setCurrentSagaId(sagaId);
+    setCurrentEpisodeId(episodeId);
+    const saga = sagas.find(s=>s.id===sagaId);
+    if(saga){
+      setPickedFruits(saga.fruits);
+      setDrama(saga.drama); setTone(saga.tone);
+    }
+    setTab('idea');
+    window.scrollTo(0,0);
+  };
+
+  const addNewEpisodeToSaga = (sagaId) => {
+    const saga = sagas.find(s=>s.id===sagaId);
+    if(!saga) return;
+    setCurrentSagaId(sagaId);
+    setCurrentEpisodeId(null); // Sin episodio actual = listo para generar el siguiente
+    setPickedFruits(saga.fruits);
+    setDrama(saga.drama); setTone(saga.tone);
+    setTab('idea');
+  };
+
+  const updateEpisode = (sagaId, epId, fields) => {
+    setSagas(prev => prev.map(s => {
+      if(s.id !== sagaId) return s;
+      return {...s, episodes: s.episodes.map(e => {
+        if(e.id !== epId) return e;
+        const updated = {...e, ...fields};
+        if(fields.idea){
+          const title = getSagaTitle(fields.idea);
+          if(title) updated.title = title;
+        }
+        return updated;
+      })};
+    }));
+  };
+
+  // ─── Generation ───
+  const runOrError = async (key, fn) => {
+    setL(key,true);
+    try { await fn(); }
+    catch(e){
+      const msg = e.transient
+        ? 'Servidores de Gemini saturados. Espera 30s y reintenta.'
+        : 'Error: '+e.message+'\n\nRevisa tu API key.';
+      alert(msg);
+    }
+    setL(key,false);
+  };
+
+  const genIdea = () => runOrError('idea', async () => {
+    if(pickedFruits.length < 2) return;
+    const dramaLabel = DRAMAS.find(d=>d.id===drama).label;
+    const toneLabel = TONES.find(t=>t.id===tone).label;
+
+    let prompt, isFirstEp, priorContext = '';
+    let targetSagaId = currentSagaId;
+    let targetEpId = currentEpisodeId;
+    let newEpNumber = 1;
+
+    if(currentSagaId && currentEpisodeId){
+      // Regenerar episodio existente
+      const saga = sagas.find(s=>s.id===currentSagaId);
+      const ep = saga.episodes.find(e=>e.id===currentEpisodeId);
+      isFirstEp = ep.number === 1;
+      newEpNumber = ep.number;
+      if(!isFirstEp){
+        const prevEps = saga.episodes.filter(e=>e.number < ep.number).sort((a,b)=>a.number-b.number);
+        priorContext = prevEps.map(e => `=== EPISODIO ${e.number}: ${e.title||''} ===\n${e.idea || ''}\n\n${e.script || ''}`).join('\n\n');
+      }
+    } else if(currentSagaId && !currentEpisodeId){
+      // Saga existente, nuevo episodio
+      const saga = sagas.find(s=>s.id===currentSagaId);
+      isFirstEp = false;
+      newEpNumber = saga.episodes.length + 1;
+      const prevEps = [...saga.episodes].sort((a,b)=>a.number-b.number);
+      priorContext = prevEps.map(e => `=== EPISODIO ${e.number}: ${e.title||''} ===\n${e.idea || ''}\n\n${e.script || ''}`).join('\n\n');
+    } else {
+      // Nueva saga
+      isFirstEp = true;
+    }
+
+    if(isFirstEp){
+      prompt = `Eres guionista experto en FRUTINOVELAS virales para TikTok/Reels (vídeos de 30-60s con frutas antropomorfizadas en dramas de telenovela latina).
+
+Crea UNA idea ALTAMENTE viral con estos parámetros:
+- Personajes: ${pickedFruits.join(', ')}
+- Tipo de drama: ${dramaLabel}
+- Tono: ${toneLabel}
+
+Devuelve EXACTAMENTE este formato sin texto extra ni markdown:
+
+TÍTULO: [título dramático en mayúsculas tipo telenovela, máximo 6 palabras]
+
+LOGLINE: [una frase impactante de máximo 25 palabras]
+
+HOOK VIRAL (primeros 3 segundos): [línea exacta del primer plano, cliffhanger]
+
+PERSONAJES:
+${pickedFruits.map(f=>`- ${f}: [personalidad + rol en 1 línea]`).join('\n')}
+
+GIRO FINAL: [el plot twist]
+
+POR QUÉ FUNCIONA: [3 razones cortas]`;
+    } else {
+      prompt = `Esta es una SAGA de frutinovelas en curso. Aquí los episodios anteriores:
+
+${priorContext}
+
+Ahora crea el EPISODIO ${newEpNumber} de la saga:
+- Mantén EXACTAMENTE los mismos personajes (${pickedFruits.join(', ')}) y su personalidad
+- Continúa la trama desde donde quedó el episodio anterior
+- Resuelve parcialmente algún cliffhanger anterior, pero abre uno nuevo más bestia
+- Sube la apuesta emocional respecto al episodio previo
+- Tono: ${toneLabel}
+
+Devuelve EXACTAMENTE este formato sin texto extra ni markdown:
+
+TÍTULO: [título del Episodio ${newEpNumber} en mayúsculas, máx 6 palabras, debe sentirse como continuación]
+
+LOGLINE: [frase impactante de máx 25 palabras]
+
+HOOK VIRAL (primeros 3 segundos): [línea exacta que conecta con el final anterior]
+
+PERSONAJES (estado en este episodio):
+${pickedFruits.map(f=>`- ${f}: [su estado emocional al inicio]`).join('\n')}
+
+GIRO FINAL: [el nuevo plot twist]
+
+POR QUÉ FUNCIONA: [3 razones cortas]`;
+    }
+
+    const r = await callGemini(apiKey, prompt, false, showFallbackToast);
+
+    // SOLO ahora creamos/actualizamos la saga
+    if(!currentSagaId){
+      // Saga totalmente nueva
+      const newSagaId = newId();
+      const newEpId = newId();
+      const sagaName = pickedFruits.map(f=>f.split(' ')[1]).join(' & ');
+      const title = getSagaTitle(r) || '';
+      const newSaga = {
+        id: newSagaId,
+        name: sagaName,
+        fruits: [...pickedFruits],
+        drama, tone,
+        createdAt: Date.now(),
+        episodes: [{ id:newEpId, number:1, title, idea:r, hook:null, script:null, scenes:null, videos:null, createdAt:Date.now() }],
+      };
+      setSagas(prev => [newSaga, ...prev]);
+      setCurrentSagaId(newSagaId);
+      setCurrentEpisodeId(newEpId);
+    } else if(currentSagaId && !currentEpisodeId){
+      // Saga existente, nuevo episodio
+      const newEpId = newId();
+      const title = getSagaTitle(r) || '';
+      const newEp = { id:newEpId, number:newEpNumber, title, idea:r, hook:null, script:null, scenes:null, videos:null, createdAt:Date.now() };
+      setSagas(prev => prev.map(s => s.id===currentSagaId ? {...s, episodes:[...s.episodes, newEp]} : s));
+      setCurrentEpisodeId(newEpId);
+    } else {
+      // Regenerar episodio existente
+      updateEpisode(currentSagaId, currentEpisodeId, { idea:r, hook:null, script:null, scenes:null, videos:null });
+    }
+    setTab('idea');
+  });
+
+  const genHook = () => runOrError('hook', async () => {
+    if(!currentEpisode) return;
+    const ideaContext = idea || `Personajes: ${pickedFruits.join(', ')}. Drama: ${DRAMAS.find(d=>d.id===drama)?.label}. Tono: ${TONES.find(t=>t.id===tone)?.label}.`;
+    const scriptContext = script ? `\nGUIÓN:\n${script}` : '';
+    const prompt = `Eres EXPERTO MUNDIAL en HOOKS virales para frutinovelas (vídeos de TikTok/Reels con frutas antropomorfizadas, dramas de telenovela latina). Tu único trabajo: crear los primeros 3-5 segundos del vídeo que DETIENEN el scroll instantáneamente.
+
+CONTEXTO DEL EPISODIO:
+${ideaContext}${scriptContext}
+
+PSICOLOGÍA DE UN HOOK BRUTAL:
+- Pattern interrupt: algo INESPERADO en la primera frame
+- Curiosity gap: plantea un misterio que SOLO se resuelve viendo el vídeo entero
+- Stakes altísimas DESDE EL FRAME 0 (nada de "Hola, hoy te voy a contar...")
+- Específico, con nombres, no genérico
+- Emoción al máximo: rabia, traición, vergüenza, terror, desesperación
+- Si hay diálogo, debe ser gritado/llorando/susurrando con peso, no neutro
+
+EJEMPLOS DE HOOKS QUE FUNCIONAN EN FRUTINOVELAS:
+- "¡La Fresa está EMBARAZADA del Mango y hoy se casa con el Plátano!" (grito en plena boda)
+- "Te juro por mi madre que no es lo que parece... pero LO ES."
+- "Hoy mato a la Sandía. O me mato yo."
+- Plano: Manzana sosteniendo un cuchillo manchado, mira a cámara y susurra: "Lo merecía."
+
+Crea UN HOOK BRUTAL nuevo. Devuelve EXACTAMENTE este formato (sin markdown, sin texto extra):
+
+🎬 PLANO DE APERTURA
+[descripción visual de UN solo frame, ultra específica: qué fruta, qué expresión exacta, qué hace con las manos, qué hay de fondo, qué iluminación, qué ángulo de cámara]
+
+🎙️ DIÁLOGO HOOK (segundos 0-3)
+[línea exacta que se pronuncia, en español, con indicación de cómo se dice entre paréntesis: (gritado), (susurrando entre lágrimas), (con desprecio), etc.]
+
+⚡ POR QUÉ DETIENE EL SCROLL
+[2-3 líneas explicando qué resorte psicológico activa: curiosidad, indignación, morbo, identificación, etc.]
+
+🔥 NIVEL DE GANCHO
+[del 1 al 10, con 1 línea justificándolo]
+
+🎯 SIGUIENTE PASO RECOMENDADO
+[1 línea: qué debería pasar en los siguientes 3 segundos para no perder al espectador]`;
+    const r = await callGemini(apiKey, prompt, false, showFallbackToast);
+    updateEpisode(currentSagaId, currentEpisodeId, { hook: r });
+    setTab('hook');
+  });
+
+  const genScript = () => runOrError('script', async () => {
+    if(!idea) return;
+    const epNum = currentEpisode.number;
+    const prevContext = isContinuing
+      ? '\nContexto: episodio '+epNum+' de la saga. Los personajes ya tienen relaciones establecidas.\n'
+      : '';
+    const hookContext = hook
+      ? `\n\nUSA OBLIGATORIAMENTE este HOOK como inicio (escena 1):\n${hook}\n\nLa primera escena del guión DEBE corresponder exactamente a este hook (plano de apertura + diálogo).\n`
+      : '';
+    const prompt = `Basándote en esta idea de frutinovela, escribe el GUIÓN COMPLETO para un vídeo de 45-60 segundos:${prevContext}${hookContext}
+
+${idea}
+
+Formato obligatorio (sin markdown):
+
+ESCENA 1 (0-5s) — [descripción visual ultra corta]
+🍓 PERSONAJE: "diálogo dramático corto"
+
+ESCENA 2 (5-15s) — [descripción]
+🥭 PERSONAJE: "diálogo"
+
+(Continúa con 5-7 escenas en total con timing claro hasta el plot twist final)
+
+REGLAS:
+- Diálogos cortos, melodramáticos, latinos
+- Cada escena con descripción visual de UNA línea
+- Usa los emojis de los personajes
+- Plot twist en la última escena
+- Total: 45-60 segundos`;
+    const r = await callGemini(apiKey, prompt, false, showFallbackToast);
+    updateEpisode(currentSagaId, currentEpisodeId, { script: r });
+    setTab('script');
+  });
+
+  const genScenes = () => runOrError('scenes', async () => {
+    if(!script) return;
+    const prompt = `Basándote en este guión de frutinovela, crea PROMPTS DE IMAGEN ultra-detallados en INGLÉS, optimizados para Midjourney/Flux/Sora/Imagen.
+
+${script}
+
+Para cada escena, este formato exacto (sin markdown):
+
+===ESCENA 1===
+PROMPT: [prompt en inglés, 40-60 palabras: anthropomorphic fruit characters with expressive faces, telenovela cinematic style, dramatic lighting, soap opera aesthetic, tropical color palette, 9:16 aspect ratio, hyperrealistic, emotional close-up]
+NEGATIVE: [ugly, distorted, low quality, etc.]
+
+===ESCENA 2===
+...
+
+(Para TODAS las escenas. Mantén consistencia visual.)`;
+    const r = await callGemini(apiKey, prompt, false, showFallbackToast);
+    updateEpisode(currentSagaId, currentEpisodeId, { scenes: r });
+    setTab('scenes');
+  });
+
+  const genVideos = () => runOrError('videos', async () => {
+    if(!script) return;
+    const prompt = `Basándote en este guión, crea PROMPTS DE VIDEO en INGLÉS para Veo 3/Kling/Runway/Sora.
+
+${script}
+
+Para cada escena, este formato exacto (sin markdown):
+
+===VIDEO ESCENA 1===
+PROMPT: [50-80 palabras: movimiento de cámara (dolly in, push in, handheld), expresiones faciales, gesto/acción, audio/diálogo en español, ambient sound, telenovela cinematic, vertical 9:16]
+CAMERA: [tipo de plano]
+DURATION: [segundos]
+DIALOGUE (es): "[diálogo exacto en español]"
+
+===VIDEO ESCENA 2===
+...
+
+(Para TODAS las escenas.)`;
+    const r = await callGemini(apiKey, prompt, false, showFallbackToast);
+    updateEpisode(currentSagaId, currentEpisodeId, { videos: r });
+    setTab('videos');
+  });
+
+  const genTrends = () => runOrError('trends', async () => {
+    const prompt = `Busca en la web AHORA contenido viral de "frutinovelas" en TikTok, Instagram Reels y YouTube Shorts esta semana.
+
+Informe en ESPAÑOL (texto plano, sin markdown):
+
+🔥 TENDENCIAS DE LA SEMANA
+- [3-5 bullets]
+
+📈 HOOKS QUE FUNCIONAN
+- [3-4 ejemplos reales]
+
+🎬 FORMATOS GANADORES
+- [duración, ritmo, estructura]
+
+🍓 FRUTAS Y PAREJAS HOT
+- [combinaciones]
+
+⚠️ QUÉ EVITAR
+- [2-3 cosas saturadas]
+
+💡 OPORTUNIDAD AHORA
+- [1 ángulo poco explotado]
+
+Sé específico, sin inventar.`;
+    const r = await callGemini(apiKey, prompt, true, showFallbackToast);
+    setTrends(r); setTab('trends');
+  });
+
+  const continueSaga = () => {
+    if(!currentSagaId) return;
+    addNewEpisodeToSaga(currentSagaId);
+  };
+
+  const exportEpisode = () => {
+    if(!currentSaga || !currentEpisode) return;
+    const ep = currentEpisode;
+    const txt = `FRUTINOVELA: ${currentSaga.name}
+EPISODIO ${ep.number}${ep.title?' — '+ep.title:''}
+Personajes: ${currentSaga.fruits.join(', ')}
+Drama: ${DRAMAS.find(d=>d.id===currentSaga.drama)?.label || ''}
+Tono: ${TONES.find(t=>t.id===currentSaga.tone)?.label || ''}
+Generado: ${new Date(ep.createdAt).toLocaleString('es-ES')}
+
+═══════════════════════════════════════
+💡 IDEA
+═══════════════════════════════════════
+
+${ep.idea || '(no generada)'}
+
+═══════════════════════════════════════
+🎣 HOOK VIRAL (primeros 3 segundos)
+═══════════════════════════════════════
+
+${ep.hook || '(no generado)'}
+
+═══════════════════════════════════════
+📝 GUIÓN
+═══════════════════════════════════════
+
+${ep.script || '(no generado)'}
+
+═══════════════════════════════════════
+🎨 PROMPTS DE IMAGEN
+═══════════════════════════════════════
+
+${ep.scenes || '(no generados)'}
+
+═══════════════════════════════════════
+🎬 PROMPTS DE VÍDEO
+═══════════════════════════════════════
+
+${ep.videos || '(no generados)'}
+
+—
+Generado con Frutinovelas Studio
+`;
+    const fname = `${currentSaga.name.replace(/[^\w]+/g,'_')}_Ep${ep.number}.txt`;
+    downloadTxt(fname, txt);
+  };
+
+  if(!apiKey){
+    return html`<${ApiKeyModal} onSave=${saveKey} />`;
+  }
+
+  const tabs = [
+    {id:'idea',   label:'Idea',       has:!!idea},
+    {id:'hook',   label:'Hook',       has:!!hook},
+    {id:'script', label:'Guión',      has:!!script},
+    {id:'scenes', label:'Imágenes',   has:!!scenes},
+    {id:'videos', label:'Vídeo',      has:!!videos},
+    {id:'trends', label:'Tendencias', has:!!trends},
+  ];
+
+  const totalEpisodes = sagas.reduce((acc,s)=>acc+s.episodes.length,0);
+  const pendingNewEp = currentSagaId && !currentEpisodeId;
+  const nextEpNumber = currentSaga ? currentSaga.episodes.length + 1 : 1;
+
+  return html`
+    <div class="top-bar">
+      <button class="top-btn" onClick=${()=>setShowSagas(true)}>
+        📚 Mis sagas${totalEpisodes>0 && html`<span class="badge">${totalEpisodes}</span>`}
+      </button>
+      <button class="top-btn" onClick=${clearKey}>⚙ API key</button>
+    </div>
+
+    ${toast && html`<${Toast} message=${toast} onClose=${()=>setToast(null)} />`}
+
+    ${showSagas && html`<${SagasModal}
+      sagas=${sagas}
+      currentSagaId=${currentSagaId}
+      currentEpisodeId=${currentEpisodeId}
+      onClose=${()=>setShowSagas(false)}
+      onLoad=${loadEpisode}
+      onAddEpisode=${addNewEpisodeToSaga}
+      onDelete=${deleteSaga}
+      onNew=${startNewSaga}
+    />`}
+
+    <div class="wrap">
+      <header>
+        <div>
+          <span class="stamp" style="color:var(--gold)">EN VIVO · 2026</span>
+          <span class="stamp" style="color:var(--magenta)">RATED · 🍓 DRAMÁTICO</span>
+        </div>
+        <h1 class="title">Fruti<span class="pink">novelas</span><span class="gold">Studio</span></h1>
+        <p class="sub">Tu estudio para crear frutinovelas virales con <span class="pink">sagas encadenadas</span>, guión, prompts e imágenes y análisis en tiempo real.</p>
+
+        ${currentSaga && html`<div class="context-bar">
+          <span class="label">📁 Saga activa</span>
+          <span class="name">${currentSaga.name}</span>
+          <span class="ep">${pendingNewEp ? 'Nuevo Ep '+nextEpNumber : `Ep ${currentEpisode?.number}/${currentSaga.episodes.length}`}</span>
+          <button onClick=${startNewSaga}>← Empezar otra</button>
+        </div>`}
+      </header>
+
+      <section class="panel ${isContinuing||pendingNewEp?'locked':''}">
+        <h2>🎭 Reparto y trama</h2>
+
+        ${(isContinuing||pendingNewEp) && html`<div class="locked-note">${pendingNewEp ? `Preparando Episodio ${nextEpNumber} de la saga "${currentSaga.name}". Los personajes y drama se heredan.` : `Continuando la saga "${currentSaga.name}". Los personajes, drama y tono están fijos.`}</div>`}
+
+        <p class="panel-lbl">Elige 2–4 personajes · seleccionados: ${pickedFruits.length}</p>
+        <div class="chips">
+          ${FRUITS.map(f => {
+            const on = pickedFruits.includes(f);
+            return html`<button class=${"chip"+(on?" on-pink":"")} onClick=${()=>toggleFruit(f)}>${f}</button>`;
+          })}
+        </div>
+
+        <p class="panel-lbl">Tipo de drama</p>
+        <div class="chips">
+          ${DRAMAS.map(d => html`<button class=${"chip"+(drama===d.id?" on-gold":"")} onClick=${()=>!(isContinuing||pendingNewEp)&&setDrama(d.id)}>${d.icon} ${d.label}</button>`)}
+        </div>
+
+        <p class="panel-lbl">Tono</p>
+        <div class="chips">
+          ${TONES.map(t => html`<button class=${"chip"+(tone===t.id?" on-cream":"")} onClick=${()=>!(isContinuing||pendingNewEp)&&setTone(t.id)}>${t.label}</button>`)}
+        </div>
+
+        <button class="btn btn-pink" onClick=${genIdea} disabled=${loading.idea || pickedFruits.length<2}>
+          ${loading.idea ? html`<span class="spin"></span>` : '🔥'} ${pendingNewEp ? `Generar Episodio ${nextEpNumber}` : isContinuing ? `Regenerar Episodio ${currentEpisode.number}` : 'Generar idea viral'} →
+        </button>
+      </section>
+
+      <div class="tabs">
+        ${tabs.map(t => html`
+          <button class=${"tab"+(tab===t.id?" active":"")} onClick=${()=>setTab(t.id)}>
+            ${t.label} ${t.has && html`<span class="dot"></span>`}
+          </button>
+        `)}
+      </div>
+
+      <main>
+        ${tab==='idea' && html`<${Panel}
+          title=${currentEpisode ? `Episodio ${currentEpisode.number}` : 'La idea'}
+          subtitle=${currentEpisode?.title || null}
+          empty=${!idea}
+          emptyMsg=${pendingNewEp ? `Pulsa 'Generar Episodio ${nextEpNumber}' arriba.` : "Configura el reparto arriba y pulsa 'Generar idea viral'."}
+          content=${idea}
+          accent="pink"
+          next=${idea && html`<div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-pink" onClick=${genHook} disabled=${loading.hook}>${loading.hook?html`<span class="spin"></span>`:'🎣'} ${hook?'Regenerar hook':'Generar hook viral'} →</button>
+            <button class="btn btn-ghost" onClick=${genScript} disabled=${loading.script}>${loading.script?html`<span class="spin"></span>`:'⚡'} Saltar a guión</button>
+          </div>`}
+        />`}
+
+        ${tab==='hook' && html`<${Panel}
+          title="Hook viral"
+          subtitle="Los primeros 3 segundos · lo que detiene el scroll"
+          empty=${!hook}
+          emptyMsg=${idea ? "Genera un hook impactante para enganchar al espectador en los primeros segundos." : "Primero necesitas una idea (o carga un episodio existente)."}
+          content=${hook}
+          accent="hook"
+          extra=${currentEpisode && html`<button class="btn btn-pink" onClick=${genHook} disabled=${loading.hook}>${loading.hook?html`<span class="spin"></span> Generando hook brutal…`:`🎣 ${hook?'Regenerar otro hook':'Generar hook viral'}`}</button>`}
+          next=${hook && html`<div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-pink" onClick=${genHook} disabled=${loading.hook}>${loading.hook?html`<span class="spin"></span>`:'🔄'} Otro hook diferente</button>
+            <button class="btn btn-ghost" onClick=${genScript} disabled=${loading.script}>${loading.script?html`<span class="spin"></span>`:'⚡'} ${script?'Regenerar':'Generar'} guión con este hook →</button>
+          </div>`}
+        />`}
+
+        ${tab==='script' && html`<${Panel}
+          title="El guión"
+          empty=${!script}
+          emptyMsg="Primero genera una idea."
+          content=${script}
+          accent="pink"
+          extra=${idea && !script && html`<button class="btn btn-pink" onClick=${genScript} disabled=${loading.script}>${loading.script?html`<span class="spin"></span>`:'✍️'} Generar guión ahora</button>`}
+          next=${script && html`<div style="margin-top:20px"><button class="btn btn-gold" onClick=${genScenes} disabled=${loading.scenes}>${loading.scenes?html`<span class="spin"></span>`:'🎨'} Prompts de imagen →</button></div>`}
+        />`}
+
+        ${tab==='scenes' && html`<${Panel}
+          title="Prompts de imagen"
+          empty=${!scenes}
+          emptyMsg="Primero necesitas un guión generado."
+          content=${scenes}
+          accent="gold"
+          extra=${script && !scenes && html`<button class="btn btn-gold" onClick=${genScenes} disabled=${loading.scenes}>${loading.scenes?html`<span class="spin"></span>`:'🎨'} Generar prompts de imagen</button>`}
+          next=${scenes && html`<div style="margin-top:20px"><button class="btn btn-orange" onClick=${genVideos} disabled=${loading.videos}>${loading.videos?html`<span class="spin"></span>`:'🎬'} Prompts de vídeo →</button></div>`}
+        />`}
+
+        ${tab==='videos' && html`<${Panel}
+          title="Prompts de vídeo"
+          empty=${!videos}
+          emptyMsg="Necesitas un guión para generar los prompts de vídeo."
+          content=${videos}
+          accent="orange"
+          extra=${script && !videos && html`<button class="btn btn-orange" onClick=${genVideos} disabled=${loading.videos}>${loading.videos?html`<span class="spin"></span>`:'🎬'} Generar prompts de vídeo</button>`}
+        />`}
+
+        ${tab==='trends' && html`<${Panel}
+          title="Análisis viral en tiempo real"
+          subtitle="Buscamos en Google ahora mismo"
+          empty=${!trends}
+          emptyMsg="Pulsa abajo para analizar qué frutinovelas están explotando esta semana."
+          content=${trends}
+          accent="pink"
+          extra=${html`<button class="btn btn-pink" onClick=${genTrends} disabled=${loading.trends}>${loading.trends?html`<span class="spin"></span> Escaneando…`:`👁 ${trends?'Volver a analizar':'Analizar tendencias ahora'}`}</button>`}
+        />`}
+
+        ${currentSaga && currentEpisode && (idea || hook || script || scenes || videos) && html`
+          <div class="panel" style="margin-top:30px">
+            <h2>📺 Continuar saga</h2>
+            <p style="color:var(--muted);font-size:14px;margin:0 0 16px">
+              Crea el siguiente episodio con el contexto completo de los anteriores. Misma serie, mismas frutas, drama que avanza.
+            </p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn btn-saga" onClick=${continueSaga}>📺 Generar Episodio ${currentSaga.episodes.length + 1} →</button>
+              <button class="btn btn-ghost" onClick=${exportEpisode}>⬇ Exportar episodio (.txt)</button>
+            </div>
+          </div>
+        `}
+      </main>
+
+      <footer>
+        <span>Frutinovelas Studio v2.2 · Powered by Gemini</span>
+        <span class="it">♥ ${sagas.length} sagas · ${totalEpisodes} episodios</span>
+      </footer>
+    </div>
+  `;
+}
+
+render(h(App), document.getElementById('app'));
+</script>
+</body>
+</html>
